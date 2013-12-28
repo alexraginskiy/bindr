@@ -1,41 +1,57 @@
 (function($){
   'use strict';
 
-  var defaults = {
+  var Bindr = function(el, options) {
+    this.$el = $(el);
+    this.options = options;
+
+    this.run();
+  };
+
+  Bindr.DEFAULTS = {
     attributeName: 'bindr',
     selector: function() {
       return ['[data-', this.attributeName, ']'].join('');
+    },
+    dataAttr: function(attribute) {
+      return this.attributeName + attribute.charAt(0).toUpperCase() + attribute.slice(1);
+    }
+  };
+
+  Bindr.prototype.methods = function() {
+    return this.$el.data(this.options.attributeName).split(' ');
+  };
+
+  Bindr.prototype.args = function() {
+    var args = this.$el.data(this.options.dataAttr('arguments')) ? this.$el.data(this.options.dataAttr('arguments')).split(', ') : [];
+    var dataArgs   = this.$el.data();
+
+    if(!args.length || this.$el.data(this.options.dataAttr('lastArg'))) {
+      args.push(dataArgs);
+    }
+
+    return args;
+  };
+
+  Bindr.prototype.run = function() {
+    var methods = this.methods().reverse();
+    var i = methods.length;
+    var args = this.args();
+
+    while(i--) {
+      this.$el[methods[i]].apply(this.$el, args);
     }
   };
 
   $.fn.bindr = function(options) {
 
-    options = $.extend({}, defaults, options);
+    options = $.extend({}, Bindr.DEFAULTS, options);
 
     return this.each(function() {
-      var $el     = $(this),
-          targets = $el.find(options.selector()).addBack(options.selector());
+      var targets = $(this).find(options.selector()).addBack(options.selector());
 
       targets.each(function() {
-        var $el            = $(this),
-            methods        = $el.data(options.attributeName).split(' ').reverse(),
-            args           = $el.data(options.attributeName+'Arguments') && $el.data(options.attributeName+'Arguments').split(', ').reverse(),
-            includeLastArg = $el.data(options.attributeName+'LastArg'),
-            method,
-            arg,
-            applyArgs = [];
-
-        while(method = methods.pop()) {
-          while(args && (arg = args.pop())) {
-            applyArgs.push(arg)
-          }
-
-          if(!applyArgs.length || includeLastArg) {
-            applyArgs.push($el.data());
-          }
-
-          $el[method].apply($el, applyArgs);
-        }
+        var bindr = new Bindr(this, options);
       });
     });
   };
