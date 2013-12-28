@@ -91,10 +91,10 @@ $('#my-element').somePlugin('first argument', 'second argument', {
 
 ### Calling multiple plugins on the same element
 
-You can call multiple plugins on the same element by seperating them with a comma and a space in the data-bindr attribute:
+You can call multiple plugins on the same element by seperating them with a space in the data-bindr attribute:
 
 ```HTML
-<div data-bindr="hide, show"></div>
+<div data-bindr="hide show"></div>
 ```
 
 ## Caveats
