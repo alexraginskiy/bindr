@@ -36,7 +36,7 @@ describe('bindr', function() {
 
   it("should pass multiple string arguments if they are provided", function() {
     var el = $('#multiple-string-arguments-bindr', this.fixtureDoc).bindr()
-    expect(this.appendStub).to.have.been.calledWithExactly('first append', 'second append')
+    expect(this.appendStub).to.have.been.calledWithExactly('<div>foo</div>', '<div>bar</div>')
   });
 
   it("should include last argument object", function() {
