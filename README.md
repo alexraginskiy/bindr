@@ -9,14 +9,14 @@ Although it requires you to decorate HTML elements in order to specify how they 
 Assume you have a jQuery plugin with the following usage:
 
 ```HTML
-<div id="my-element"></div>
+<div id="my-element">...</div>
 ```
 
 ```JavaScript
 $('#my-element').foo()
 ```
 
-If you wanted to call this plugin on any element, you could create a seperate .js file that looks for a specific selectors:
+If you wanted to call this plugin on any element, you could create a seperate .js file that looks for a specific selector:
 
 ```JavaScript
 $('.foo-element').foo()
@@ -25,20 +25,23 @@ $('[data-trigger="foo"]').foo()
 ```
 
 ```HTML
-<div id="my-element" class="foo-element"></div>
+<div id="my-element" class="foo-element">...</div>
 <!-- or -->
-<div id="my-element" data-trigger="foo"></div>
+<div id="my-element" data-trigger="foo">...</div>
 ```
 
-Of course doing this everytime you want to assign behavior can be quite repetive, so bindr can 
-
-With bindr, however, you could simply call any plugin by adding some data attributes to the elements in your HTML:
+Of course doing this everytime you want to assign behavior can be quite repetive. With bindr, however, you could simply call any plugin by adding some data attributes to the elements in your HTML:
 
 ```HTML
-<div id="my-element" data-bindr="foo"></div>
+<div id="my-element" data-bindr="foo">...</div>
 ```
 
-No extra JavaScript is required once you include bindr.
+then tell bindr to scan the elements
+```JavaScript
+  $('#my-element').bindr()
+  // or run it on the whole page, or any other parent
+  $('body').bindr()
+```
 
 #### Passing arguments
 
@@ -47,7 +50,7 @@ If the plugin you would like to trigger takes arguments, you can pass them in va
 ##### String arguments
 
 ```HTML
-<div id="my-element" data-bindr="text" data-bindr-arguments="some text"></div>
+<div id="my-element" data-bindr="text" data-bindr-arguments="some text">...</div>
 ```
 is equivalent to
 ```JavaScript
@@ -55,7 +58,7 @@ $('#my-element').text('some text')
 ```
 
 ```HTML
-<div id="my-element" data-bindr="append" data-bindr-arguments="<div>foo</div>, <div>bar</div>"></div>
+<div id="my-element" data-bindr="append" data-bindr-arguments="<div>foo</div>, <div>bar</div>">...</div>
 ```
 is equivalent to
 ```JavaScript
@@ -67,7 +70,7 @@ $('#my-element').append('<div>foo</div>', '<div>bar</div>')
 If your plugin takes an object as an argument, you can specify the properties of the object argument by using data attributes:
 
 ```HTML
-<div id="my-element" data-bindr="animate" data-height="200" data-width="200"></div>
+<div id="my-element" data-bindr="animate" data-height="200" data-width="200">...</div>
 ```
 is equivalent to 
 ```JavaScript
@@ -79,7 +82,7 @@ $('#my-element').animate({height: 200, width: 200})
 Often times, plugins will take string and object arguments.  Bindr allows you to pass string arguments first, and an object argument last.
 
 ```HTML
-<div id="my-element" data-bindr="somePlugin" data-bindr-arguments="first argument, second argument" data-foo="some value" data-bar="false"></div>
+<div id="my-element" data-bindr="somePlugin" data-bindr-arguments="first argument, second argument" data-foo="some value" data-bar="false">...</div>
 ```
 is equivalent to
 ```JavaScript
@@ -89,12 +92,39 @@ $('#my-element').somePlugin('first argument', 'second argument', {
 })
 ```
 
-### Calling multiple plugins on the same element
+### Other options
 
 You can call multiple plugins on the same element by seperating them with a space in the data-bindr attribute:
 
 ```HTML
-<div data-bindr="hide show"></div>
+<div data-bindr="hide show">...</div>
+```
+
+You can pass different arguments to different plugins, and specify which if any methods get a object as their last argument:
+
+```HTML
+<div 
+  id="different-params-bindr" 
+  data-bindr="hide show" 
+  data-bindr-arguments-hide="hide arg, other hide arg" 
+  data-bindr-arguments-show="show args" 
+  data-bindr-show-last-arg="true">
+  ...
+</div>
+```
+
+### Renaming the data attribute
+
+You can specify the prefix of all data attributes associated to bindr by passing `attributeName` when calling bindr:
+
+```JavaScript
+  $('body').bindr({attributeName: 'assign'})
+```
+
+then use it in your html anywhere the above examples use bindr:
+
+```HTML
+<div data-assign="append" data-assign-arguments="some text, more text">...</div>
 ```
 
 ## Caveats

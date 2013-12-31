@@ -43,6 +43,17 @@ describe('bindr', function() {
     var el = $('#last-param-arg-arguments-bindr', this.fixtureDoc)
     el.bindr()
     expect(this.appendStub).to.have.been.calledWithExactly('first append', 'second append', el.data())
-
   });
+
+  it("should let you set the name of the data attribute", function() {
+    var el = $('#different-name-bindr', this.fixtureDoc).bindr({attributeName: 'foobar'})
+    expect(this.hideStub).to.have.been.calledWith('some argument', el.data())
+  });
+
+  it("should call methods with different params", function() {
+    var el = $('#different-params-bindr', this.fixtureDoc).bindr()
+    expect(this.hideStub).to.have.been.calledWithExactly('hide arg', 'other hide arg')
+    expect(this.showStub).to.have.been.calledWithExactly('show args', el.data())
+  });
+
 })

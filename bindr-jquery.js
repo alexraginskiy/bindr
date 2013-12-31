@@ -1,6 +1,10 @@
 (function($){
   'use strict';
 
+  function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   var Bindr = function(el, options) {
     this.$el = $(el);
     this.options = options;
@@ -14,7 +18,7 @@
       return ['[data-', this.attributeName, ']'].join('');
     },
     dataAttr: function(attribute) {
-      return this.attributeName + attribute.charAt(0).toUpperCase() + attribute.slice(1);
+      return this.attributeName + capitalize(attribute);
     }
   };
 
@@ -22,11 +26,25 @@
     return this.$el.data(this.options.attributeName).split(' ');
   };
 
-  Bindr.prototype.args = function() {
-    var args = this.$el.data(this.options.dataAttr('arguments')) ? this.$el.data(this.options.dataAttr('arguments')).split(', ') : [];
-    var dataArgs   = this.$el.data();
+  Bindr.prototype.args = function(methodName) {
 
-    if(!args.length || this.$el.data(this.options.dataAttr('lastArg'))) {
+    var args = [],
+        passedArgs,
+        dataArgs = this.$el.data();
+
+    if (typeof methodName !== 'undefined' && args !== null) {
+      passedArgs = this.$el.data(this.options.dataAttr('arguments' + capitalize(methodName)))
+    }
+    
+    if (!passedArgs) {
+      passedArgs = this.$el.data(this.options.dataAttr('arguments'))
+    }
+
+    if (passedArgs) {
+      args = passedArgs.split(', ');
+    }
+
+    if (!args.length || this.$el.data(this.options.dataAttr('lastArg')) || this.$el.data(this.options.dataAttr(capitalize(methodName) + 'LastArg'))) {
       args.push(dataArgs);
     }
 
@@ -34,12 +52,15 @@
   };
 
   Bindr.prototype.run = function() {
-    var methods = this.methods().reverse();
-    var i = methods.length;
-    var args = this.args();
+    var methods = this.methods().reverse(),
+        i = methods.length,
+        method,
+        args;
 
     while(i--) {
-      this.$el[methods[i]].apply(this.$el, args);
+      method = methods[i];
+      args = this.args(method);
+      this.$el[method].apply(this.$el, args);
     }
   };
 
@@ -51,7 +72,7 @@
       var targets = $(this).find(options.selector()).addBack(options.selector());
 
       targets.each(function() {
-        var bindr = new Bindr(this, options);
+        new Bindr(this, options);
       });
     });
   };
